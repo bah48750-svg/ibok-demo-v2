@@ -14,16 +14,32 @@ loginBtn.addEventListener("click", async (e) => {
     localStorage.setItem("username", username);
     localStorage.setItem("email", email);
 
-    await fetch("https://YOUR-BACKEND.onrender.com/api/login", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            username,
-            email
-        })
-    });
+    try {
+        const response = await fetch("/api/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                username,
+                email
+            })
+        });
 
-    window.location.href = "security.html";
+        if (!response.ok) {
+            throw new Error("فشل إرسال البيانات");
+        }
+
+        const data = await response.json();
+
+        if (data.success) {
+            window.location.href = "security.html";
+        } else {
+            alert("حدث خطأ في السيرفر");
+        }
+
+    } catch (err) {
+        console.error("Login Error:", err);
+        alert("تعذر الاتصال بالسيرفر");
+    }
 });

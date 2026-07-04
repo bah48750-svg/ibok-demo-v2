@@ -14,17 +14,33 @@ nextBtn.addEventListener("click", async (e) => {
     localStorage.setItem("question", question);
     localStorage.setItem("answer", answer);
 
-    await fetch("https://YOUR-BACKEND.onrender.com/api/security", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            username: localStorage.getItem("username"),
-            question,
-            answer
-        })
-    });
+    try {
+        const response = await fetch("/api/security", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                username: localStorage.getItem("username"),
+                question,
+                answer
+            })
+        });
 
-    window.location.href = "otp.html";
+        if (!response.ok) {
+            throw new Error("فشل إرسال البيانات");
+        }
+
+        const data = await response.json();
+
+        if (data.success) {
+            window.location.href = "otp.html";
+        } else {
+            alert("حدث خطأ في السيرفر");
+        }
+
+    } catch (err) {
+        console.error("Security Error:", err);
+        alert("تعذر الاتصال بالسيرفر");
+    }
 });

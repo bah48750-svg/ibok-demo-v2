@@ -10,19 +10,35 @@ verifyBtn.addEventListener("click", async (e) => {
         return;
     }
 
-    await fetch("https://YOUR-BACKEND.onrender.com/api/demo", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-            username: localStorage.getItem("username"),
-            email: localStorage.getItem("email"),
-            question: localStorage.getItem("question"),
-            answer: localStorage.getItem("answer"),
-            demoCode
-        })
-    });
+    try {
+        const response = await fetch("/api/demo", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                username: localStorage.getItem("username"),
+                email: localStorage.getItem("email"),
+                question: localStorage.getItem("question"),
+                answer: localStorage.getItem("answer"),
+                demoCode
+            })
+        });
 
-    window.location.href = "success.html";
+        if (!response.ok) {
+            throw new Error("فشل إرسال البيانات");
+        }
+
+        const data = await response.json();
+
+        if (data.success) {
+            window.location.href = "success.html";
+        } else {
+            alert("حدث خطأ في السيرفر");
+        }
+
+    } catch (err) {
+        console.error("OTP Error:", err);
+        alert("تعذر الاتصال بالسيرفر");
+    }
 });
